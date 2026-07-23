@@ -1,7 +1,6 @@
-# Starter Template — Full-Stack
+# PromptHub — Full-Stack
 
-Template สำหรับนักศึกษาที่อยากเรียนรู้การพัฒนา Full-Stack Web Application ตั้งแต่ต้น
-ใช้เป็นฐานในการต่อยอดโปรเจกต์ได้เลย มี Users Management เป็นตัวอย่าง Resource พร้อม Clean Architecture ครบชุด
+Marketplace สำหรับซื้อขายผลลัพธ์จาก AI Prompt ครีเอเตอร์อัปโหลดผลงาน กำหนดพารามิเตอร์ AI ผู้ซื้อค้นหาและชำระเงินเพื่อปลดล็อกคำสั่ง
 
 **Tech Stack**
 
@@ -17,7 +16,7 @@ Template สำหรับนักศึกษาที่อยากเร�
 ## โครงสร้างโปรเจกต์
 
 ```
-starter-template/
+PromptHub/
 ├── .github/
 │   └── workflows/
 │       └── deploy.yml       # CI/CD pipeline รวม backend + frontend
@@ -119,7 +118,7 @@ push to main
 
 1. ไปที่ [dash.cloudflare.com/profile/api-tokens](https://dash.cloudflare.com/profile/api-tokens)
 2. กด **Create Token** → เลือก **Create Custom Token**
-3. ตั้งชื่อ เช่น `starter-deploy`
+3. ตั้งชื่อ เช่น `prompthub-deploy`
 4. เพิ่ม Permissions ดังนี้:
 
    | Scope | Resource | Permission |
@@ -146,7 +145,7 @@ push to main
 ### Secret 3 — `D1_DATABASE_ID`
 
 ```bash
-npx wrangler d1 create starter-db
+npx wrangler d1 create prompthub-db
 ```
 
 Output:
@@ -177,7 +176,7 @@ id = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"  ← คัดลอกอันนี�
 
 ชื่อ Cloudflare Pages project ของคุณ — ตั้งชื่อที่ unique เป็นของตัวเอง
 
-- ตัวอย่าง: `john-wellness-app`, `my-health-tracker`
+- ตัวอย่าง: `john-prompthub-app`, `my-prompt-hub`
 - URL ที่ได้: `https://<PAGES_PROJECT_NAME>.pages.dev`
 
 > ชื่อต้อง **unique ทั่วโลก** เพราะ `pages.dev` เป็น domain ที่ใช้ร่วมกัน ถ้าซ้ำจะ deploy ไม่ได้
@@ -191,7 +190,7 @@ URL ของ backend Workers ที่ deploy แล้ว รู้ได้�
 1. Push code ขึ้น `main` และรอให้ `deploy-backend` job ผ่าน
 2. ดู log ของ workflow จะเห็น:
    ```
-   ✅ Backend deployed to https://starter-backend.yourname.workers.dev
+   ✅ Backend deployed to https://prompthub-backend.yourname.workers.dev
    ```
 3. คัดลอก URL นั้น → เพิ่มเป็น Secret `VITE_BACKEND_URL`
 4. Push อีกครั้งเพื่อให้ frontend build ด้วย URL ที่ถูกต้อง

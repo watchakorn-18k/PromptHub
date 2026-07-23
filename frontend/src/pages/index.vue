@@ -4,9 +4,9 @@ import { useSEO } from '@/composables/useSEO'
 import { useUserStore } from '@/stores/use-user-store'
 
 useSEO({
-  title: 'Dashboard - Starter',
-  description: 'Starter template overview.',
-  keywords: ['dashboard', 'starter', 'template'],
+  title: 'Dashboard - PromptHub',
+  description: 'PromptHub marketplace overview.',
+  keywords: ['prompthub', 'dashboard', 'prompt marketplace'],
 })
 
 const userStore = useUserStore()

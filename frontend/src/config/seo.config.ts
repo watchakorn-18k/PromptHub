@@ -27,8 +27,8 @@ export interface PageSEO {
 
 // Default SEO Configuration
 export const defaultSEO: SEOConfig = {
-  title: 'Fakduai - Web App Starter Template',
-  description: 'A modern, feature-rich Vue 3 + Vuetify admin template with TypeScript support. Build powerful web applications faster with pre-built components and layouts.',
+  title: 'PromptHub - AI Prompt Marketplace',
+  description: 'PromptHub - Marketplace สำหรับซื้อขายผลลัพธ์จาก AI Prompt ค้นหาเปรียบเทียบ และปลดล็อกคำสั่ง AI จากครีเอเตอร์',
   keywords: [
     'vue3',
     'vuetify',
@@ -37,13 +37,13 @@ export const defaultSEO: SEOConfig = {
     'web app',
     'typescript',
     'fakduai',
-    'starter template',
+    'prompt marketplace',
     'vue admin',
   ],
   author: 'Fakduai',
   siteUrl: import.meta.env.VITE_APP_URL || 'https://yourdomain.com',
-  siteName: 'Fakduai',
-  twitterHandle: import.meta.env.VITE_TWITTER_HANDLE || '@yourtwitter',
+  siteName: 'PromptHub',
+  twitterHandle: import.meta.env.VITE_TWITTER_HANDLE || '@prompthub',
   locale: 'en_US',
   themeColor: '#3b82f6',
   ogImage: '/og-image.png',

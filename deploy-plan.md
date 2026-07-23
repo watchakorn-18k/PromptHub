@@ -1,4 +1,4 @@
-# Deploy Plan — Starter Template (สำหรับ LLM / openclaw)
+# Deploy Plan — PromptHub (สำหรับ LLM / openclaw)
 
 เอกสารนี้เขียนให้ **LLM agent อ่านแล้วทำ deploy ได้เอง** โดยใช้ **GitHub + Cloudflare (ฟรีทั้งหมด)**
 ทุกขั้นตอนมี label บอกชัดว่าใครทำ:
@@ -92,7 +92,7 @@ git push -u origin main
 cd backend
 
 # สร้าง D1 database → คัดลอกค่า database_id จาก output
-npx wrangler d1 create starter-db
+npx wrangler d1 create prompthub-db
 
 # สร้าง KV namespace → คัดลอกค่า id จาก output
 npx wrangler kv namespace create CACHE
@@ -113,7 +113,7 @@ npx wrangler kv namespace create CACHE
 
 **3.1 API Token** — https://dash.cloudflare.com/profile/api-tokens
 1. **Create Token → Create Custom Token**
-2. ตั้งชื่อ เช่น `starter-deploy`
+2. ตั้งชื่อ เช่น `prompthub-deploy`
 3. Permissions (เพิ่มให้ครบ 4):
 
    | Scope | Resource | Permission |
@@ -143,7 +143,7 @@ npx wrangler kv namespace create CACHE
 | 2 | `CLOUDFLARE_ACCOUNT_ID` | Account ID | STEP 3.2 |
 | 3 | `D1_DATABASE_ID` | database_id | STEP 2 |
 | 4 | `KV_NAMESPACE_ID` | kv id | STEP 2 |
-| 5 | `PAGES_PROJECT_NAME` | ชื่อ project ตั้งเอง ต้อง **unique ทั่วโลก** เช่น `john-starter-app` | ตั้งเอง |
+| 5 | `PAGES_PROJECT_NAME` | ชื่อ project ตั้งเอง ต้อง **unique ทั่วโลก** เช่น `john-prompthub-app` | ตั้งเอง |
 | 6 | `VITE_BACKEND_URL` | ใส่ทีหลัง (STEP 6) — รอบแรกเว้นว่างหรือใส่ placeholder | หลัง deploy backend |
 
 > **ทำไม agent ทำแทนไม่ได้:** ถ้ามี `gh secret set` และ user ยินยอมส่ง token มาให้ agent สามารถรันได้
@@ -185,7 +185,7 @@ gh run watch          # ดู log แบบ realtime
 ### STEP 6 — เติม `VITE_BACKEND_URL` แล้ว deploy ซ้ำ
 
 หลัง `deploy-backend` ผ่านครั้งแรก จะได้ URL backend เช่น
-`https://starter-backend.<subdomain>.workers.dev`
+`https://prompthub-backend.<subdomain>.workers.dev`
 
 **🤖 AGENT** — ดึง URL จาก log ได้:
 ```bash
@@ -195,7 +195,7 @@ gh run view --log | grep "Backend deployed to"
 **👤 USER** (หรือ 🤖 AGENT ถ้าถือ token ได้) — ใส่ค่า Secret `VITE_BACKEND_URL`:
 ```bash
 # 🤖 AGENT (ถ้า gh login ok)
-gh secret set VITE_BACKEND_URL --body "https://starter-backend.<subdomain>.workers.dev"
+gh secret set VITE_BACKEND_URL --body "https://prompthub-backend.<subdomain>.workers.dev"
 ```
 
 แล้ว trigger deploy อีกครั้งให้ frontend build ด้วย URL ที่ถูกต้อง:
@@ -214,10 +214,10 @@ git push origin main
 
 ```bash
 # Backend health check
-curl https://starter-backend.<subdomain>.workers.dev/health
+curl https://prompthub-backend.<subdomain>.workers.dev/health
 
 # API docs (เปิดในเบราว์เซอร์)
-# https://starter-backend.<subdomain>.workers.dev/docs
+# https://prompthub-backend.<subdomain>.workers.dev/docs
 
 # Frontend
 curl -I https://<PAGES_PROJECT_NAME>.pages.dev
@@ -239,13 +239,13 @@ curl -I https://<PAGES_PROJECT_NAME>.pages.dev
 cd backend
 cp wrangler.example.jsonc wrangler.jsonc
 # แทนที่ <REPLACE_WITH_D1_DATABASE_ID> และ <REPLACE_WITH_KV_NAMESPACE_ID> ด้วยค่าจริงจาก STEP 2
-npx wrangler d1 migrations apply starter-db --remote
+npx wrangler d1 migrations apply prompthub-db --remote
 npm run deploy
 
 # --- Frontend ---
 cd ../frontend
 pnpm install
-VITE_BACKEND_URL="https://starter-backend.<subdomain>.workers.dev" pnpm build
+VITE_BACKEND_URL="https://prompthub-backend.<subdomain>.workers.dev" pnpm build
 npx wrangler pages deploy dist --project-name=<PAGES_PROJECT_NAME> --branch=main
 ```
 
@@ -295,5 +295,3 @@ npx wrangler pages deploy dist --project-name=<PAGES_PROJECT_NAME> --branch=main
 - **Cloudflare KV**: 100,000 reads/วัน, 1,000 writes/วัน ฟรี
 
 เพียงพอสำหรับโปรเจกต์นักศึกษา / demo / portfolio
-</content>
-</invoke>
