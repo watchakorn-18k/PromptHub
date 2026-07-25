@@ -131,9 +131,17 @@ export const usePromptStore = defineStore('PromptStore', () => {
     try {
       const res = await promptApi.create(body)
       // Prepend to myPrompts list for instant UI update
+      const d = res.data
       myPrompts.value.unshift({
-        ...res.data,
-        previewMedia: res.data.media?.slice(0, 1) ?? [],
+        id: d.id,
+        title: d.title,
+        description: d.description,
+        price: d.price,
+        modelType: d.modelType,
+        status: d.status,
+        previewMedia: d.media?.slice(0, 1) ?? [],
+        creator: d.creator,
+        createdAt: d.createdAt,
       })
       return res.data
     }
@@ -154,9 +162,17 @@ export const usePromptStore = defineStore('PromptStore', () => {
       // Update in myPrompts list
       const idx = myPrompts.value.findIndex(p => p.id === id)
       if (idx !== -1) {
+        const d = res.data
         myPrompts.value[idx] = {
-          ...res.data,
-          previewMedia: res.data.media?.slice(0, 1) ?? [],
+          id: d.id,
+          title: d.title,
+          description: d.description,
+          price: d.price,
+          modelType: d.modelType,
+          status: d.status,
+          previewMedia: d.media?.slice(0, 1) ?? [],
+          creator: d.creator,
+          createdAt: d.createdAt,
         }
       }
       return res.data
