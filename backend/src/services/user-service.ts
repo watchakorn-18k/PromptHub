@@ -1,5 +1,5 @@
-import type { CreateUserInput, UpdateUserInput, User } from '../domain/entities/user'
-import { ConflictError, NotFoundError, ValidationError } from '../domain/errors'
+import type { UpdateUserInput, User } from '../domain/entities/user'
+import { NotFoundError, ValidationError } from '../domain/errors'
 import type { CacheRepository } from '../domain/repositories/cache-repository'
 import type { UserRepository } from '../domain/repositories/user-repository'
 
@@ -25,16 +25,6 @@ export class UserService {
 
     await this.cache.set(cacheKey(id), user, CACHE_TTL_SECONDS)
     return user
-  }
-
-  async createUser(input: CreateUserInput): Promise<User> {
-    this.validateEmail(input.email)
-    if (!input.name?.trim()) throw new ValidationError('name is required')
-
-    const existing = await this.userRepository.findByEmail(input.email)
-    if (existing) throw new ConflictError('Email is already registered')
-
-    return this.userRepository.create({ email: input.email, name: input.name.trim() })
   }
 
   async updateUser(id: string, input: UpdateUserInput): Promise<User> {

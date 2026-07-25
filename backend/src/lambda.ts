@@ -5,11 +5,17 @@ import { handle } from 'hono/aws-lambda'
 import { createApp } from './app'
 import { createContainer } from './di/container'
 import { MemoryCacheRepository } from './infrastructure/memory/memory-cache-repository'
+import { MemoryMediaRepository } from './infrastructure/memory/memory-media-repository'
+import { MemoryPromptRepository } from './infrastructure/memory/memory-prompt-repository'
 import { MemoryUserRepository } from './infrastructure/memory/memory-user-repository'
+import { R2MediaStorage } from './infrastructure/r2/r2-media-storage'
 
 const container = createContainer({
   userRepository: new MemoryUserRepository(),
   cacheRepository: new MemoryCacheRepository(),
+  promptRepository: new MemoryPromptRepository(),
+  mediaRepository: new MemoryMediaRepository(),
+  mediaStorage: new R2MediaStorage(undefined),
 })
 
 const app = createApp(() => container)

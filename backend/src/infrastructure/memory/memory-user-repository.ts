@@ -1,8 +1,8 @@
-import type { CreateUserInput, UpdateUserInput, User } from '../../domain/entities/user'
-import type { UserRepository } from '../../domain/repositories/user-repository'
+
+import type { UpdateUserInput, User } from '../../domain/entities/user'
+import type { CreateUserData, UserRepository } from '../../domain/repositories/user-repository'
 
 // Reference implementation for runtimes without D1 (AWS Lambda, local tests).
-// Swap for a DynamoDB/RDS-backed repository in production Lambda deployments.
 export class MemoryUserRepository implements UserRepository {
   private readonly users = new Map<string, User>()
 
@@ -18,12 +18,19 @@ export class MemoryUserRepository implements UserRepository {
     return [...this.users.values()].find((u) => u.email === email) ?? null
   }
 
-  async create(input: CreateUserInput): Promise<User> {
+  async create(input: CreateUserData): Promise<User> {
+    const now = new Date().toISOString()
     const user: User = {
       id: crypto.randomUUID(),
       email: input.email,
       name: input.name,
-      createdAt: new Date().toISOString(),
+      displayName: input.displayName,
+      avatarUrl: undefined,
+      bio: undefined,
+      role: input.role as User['role'],
+      passwordHash: input.passwordHash,
+      createdAt: now,
+      updatedAt: now,
     }
     this.users.set(user.id, user)
     return user
@@ -36,6 +43,10 @@ export class MemoryUserRepository implements UserRepository {
       ...existing,
       email: input.email ?? existing.email,
       name: input.name ?? existing.name,
+      displayName: input.displayName ?? existing.displayName,
+      avatarUrl: input.avatarUrl ?? existing.avatarUrl,
+      bio: input.bio ?? existing.bio,
+      updatedAt: new Date().toISOString(),
     }
     this.users.set(id, updated)
     return updated

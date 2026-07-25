@@ -1,5 +1,5 @@
 import type { Context } from 'hono'
-import type { CreateUserInput, UpdateUserInput } from '../domain/entities/user'
+import type { CreateUserInput, UpdateUserInput, User } from '../domain/entities/user'
 import { ValidationError } from '../domain/errors'
 import type { UserService } from '../services/user-service'
 
@@ -8,24 +8,18 @@ export class UserHandler {
 
   list = async (c: Context) => {
     const users = await this.userService.listUsers()
-    return c.json({ data: users })
+    return c.json({ data: users.map(stripPassword) })
   }
 
   get = async (c: Context) => {
     const user = await this.userService.getUser(this.param(c, 'id'))
-    return c.json({ data: user })
-  }
-
-  create = async (c: Context) => {
-    const body = await this.parseJson<CreateUserInput>(c)
-    const user = await this.userService.createUser(body)
-    return c.json({ data: user }, 201)
+    return c.json({ data: stripPassword(user) })
   }
 
   update = async (c: Context) => {
     const body = await this.parseJson<UpdateUserInput>(c)
     const user = await this.userService.updateUser(this.param(c, 'id'), body)
-    return c.json({ data: user })
+    return c.json({ data: stripPassword(user) })
   }
 
   delete = async (c: Context) => {
@@ -46,4 +40,9 @@ export class UserHandler {
       throw new ValidationError('Invalid JSON body')
     }
   }
+}
+
+function stripPassword(user: User) {
+  const { passwordHash, ...rest } = user
+  return rest
 }

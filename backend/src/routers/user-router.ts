@@ -1,7 +1,6 @@
 import { Hono } from 'hono'
 import { describeRoute, resolver, validator } from 'hono-openapi'
 import {
-  createUserSchema,
   errorResponseSchema,
   idParamSchema,
   updateUserSchema,
@@ -27,21 +26,6 @@ export function createUserRouter() {
       },
     }),
     (c) => c.get('container').userHandler.list(c)
-  )
-
-  router.post(
-    '/',
-    describeRoute({
-      tags: ['Users'],
-      summary: 'Create a user',
-      responses: {
-        201: { description: 'User created', content: jsonContent(userResponseSchema) },
-        400: { description: 'Invalid input', content: jsonContent(errorResponseSchema) },
-        409: { description: 'Email already registered', content: jsonContent(errorResponseSchema) },
-      },
-    }),
-    validator('json', createUserSchema),
-    (c) => c.get('container').userHandler.create(c)
   )
 
   router.get(
