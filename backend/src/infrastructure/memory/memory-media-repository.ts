@@ -34,6 +34,14 @@ export class MemoryMediaRepository implements MediaRepository {
     return this.media.get(id) ?? null
   }
 
+  async deleteByPromptId(promptId: string): Promise<void> {
+    for (const [id, item] of this.media) {
+      if (item.promptId === promptId) {
+        this.media.delete(id)
+      }
+    }
+  }
+
   async unlinkFromPrompt(promptId: string): Promise<void> {
     for (const [id, item] of this.media) {
       if (item.promptId === promptId) {

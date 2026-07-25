@@ -23,7 +23,7 @@ CREATE INDEX IF NOT EXISTS idx_prompts_created_at ON prompts(created_at DESC);
 
 CREATE TABLE IF NOT EXISTS prompt_media (
   id TEXT PRIMARY KEY DEFAULT (lower(hex(randomblob(16)))),
-  prompt_id TEXT NOT NULL,
+  prompt_id TEXT,
   url TEXT NOT NULL,
   media_type TEXT NOT NULL CHECK(media_type IN ('image', 'video')),
   sort_order INTEGER NOT NULL DEFAULT 0,

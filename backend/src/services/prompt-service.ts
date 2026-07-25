@@ -30,25 +30,10 @@ export class PromptService {
 
     // Attach pre-uploaded media if provided
     if (input.mediaIds && input.mediaIds.length > 0) {
-      // Update media rows to link them to this prompt
-      const mediaItems = await Promise.all(
-        input.mediaIds.map((mediaId, idx) =>
-          this.mediaRepository.create({
-            promptId: prompt.id,
-            url: '', // We'll update with existing media URL
-            mediaType: 'image', // Overwritten below
-            sortOrder: idx,
-          })
-        )
-      )
-
-      // Fetch original media items to get their url/mediaType, then update
       for (let i = 0; i < input.mediaIds.length; i++) {
         const existing = await this.mediaRepository.findById(input.mediaIds[i]!)
         if (existing) {
-          // Unlink from previous prompt (if any) — but media IDs are unique so they shouldn't be linked yet
           await this.mediaRepository.delete(existing.id)
-          // Re-create with correct promptId
           await this.mediaRepository.create({
             promptId: prompt.id,
             url: existing.url,
@@ -136,7 +121,8 @@ export class PromptService {
       throw new ForbiddenError('You can only delete your own prompts')
     }
 
+    // D1 does not enforce foreign key constraints, so manually delete media first
+    await this.mediaRepository.deleteByPromptId(id)
     await this.promptRepository.delete(id)
-    // Media is cascade-deleted by D1 foreign key
   }
 }

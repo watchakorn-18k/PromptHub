@@ -1,6 +1,10 @@
 <script setup lang="ts">
 import { PerfectScrollbar } from 'vue3-perfect-scrollbar'
-import avatar1 from '@images/avatars/avatar-1.png'
+import { useUserStore } from '@/stores/use-user-store'
+import defaultAvatar from '@images/avatars/avatar-1.png'
+
+const userStore = useUserStore()
+const router = useRouter()
 
 const userProfileList = [
   { type: 'divider' },
@@ -16,29 +20,27 @@ const userProfileList = [
     title: 'Settings',
     value: 'settings',
   },
-  {
-    type: 'navItem',
-    icon: 'ri-file-text-line',
-    title: 'Billing Plan',
-    value: 'billing',
-    badgeProps: { color: 'error', content: '4' },
-  },
   { type: 'divider' },
-  {
-    type: 'navItem',
-    icon: 'ri-money-dollar-circle-line',
-    title: 'Pricing',
-    value: 'pricing',
-  },
-  {
-    type: 'navItem',
-    icon: 'ri-question-line',
-    title: 'FAQ',
-    value: 'faq',
-  },
-  { type: 'divider' },
-
 ]
+
+function navigateTo(value: string | undefined) {
+  if (value === 'profile') {
+    router.push('/profile')
+  }
+  else if (value === 'settings') {
+    router.push('/profile')
+  }
+}
+
+function onLogout() {
+  userStore.logout()
+  router.push('/login')
+}
+
+const userDisplayName = computed(() => userStore.currentUser?.display_name ?? 'User')
+const userRole = computed(() => userStore.currentUser?.role ?? '—')
+const userAvatar = computed(() => userStore.currentUser?.avatar_url ?? defaultAvatar)
+const userEmail = computed(() => userStore.currentUser?.email ?? '')
 </script>
 
 <template>
@@ -54,9 +56,19 @@ const userProfileList = [
       class="cursor-pointer"
       size="38"
     >
-      <VImg :src="avatar1" />
+      <VImg
+        v-if="userStore.currentUser?.avatar_url"
+        :src="userAvatar"
+        alt="Avatar"
+      />
+      <span
+        v-else
+        class="text-body-1 font-weight-bold text-primary"
+      >
+        {{ userDisplayName.charAt(0).toUpperCase() }}
+      </span>
 
-      <!-- SECTION Menu -->
+      <!-- User Menu -->
       <VMenu
         activator="parent"
         width="230"
@@ -64,7 +76,7 @@ const userProfileList = [
         offset="15px"
       >
         <VList>
-          <!-- 👉 User Avatar & Name -->
+          <!-- User Avatar & Name -->
           <VListItem>
             <template #prepend>
               <VListItemAction start>
@@ -79,17 +91,26 @@ const userProfileList = [
                     color="primary"
                     variant="tonal"
                   >
-                    <VImg :src="avatar1" />
+                    <VImg
+                      v-if="userStore.currentUser?.avatar_url"
+                      :src="userAvatar"
+                    />
+                    <span
+                      v-else
+                      class="text-h6 font-weight-bold text-primary"
+                    >
+                      {{ userDisplayName.charAt(0).toUpperCase() }}
+                    </span>
                   </VAvatar>
                 </VBadge>
               </VListItemAction>
             </template>
 
             <h6 class="text-sm font-weight-medium">
-              John Doe
+              {{ userDisplayName }}
             </h6>
             <VListItemSubtitle class="text-capitalize text-disabled">
-              Admin
+              {{ userRole }}
             </VListItemSubtitle>
           </VListItem>
 
@@ -101,6 +122,7 @@ const userProfileList = [
               <VListItem
                 v-if="item.type === 'navItem'"
                 :value="item.value"
+                @click="navigateTo(item.value)"
               >
                 <template #prepend>
                   <VIcon
@@ -110,16 +132,6 @@ const userProfileList = [
                 </template>
 
                 <VListItemTitle>{{ item.title }}</VListItemTitle>
-
-                <template
-                  v-if="item.badgeProps"
-                  #append
-                >
-                  <VBadge
-                    inline
-                    v-bind="item.badgeProps"
-                  />
-                </template>
               </VListItem>
 
               <VDivider
@@ -128,12 +140,11 @@ const userProfileList = [
               />
             </template>
 
-            <VListItem>
+            <VListItem @click="onLogout">
               <VBtn
                 block
                 color="error"
                 append-icon="ri-logout-box-r-line"
-                to="/login"
               >
                 Logout
               </VBtn>
@@ -141,7 +152,6 @@ const userProfileList = [
           </PerfectScrollbar>
         </VList>
       </VMenu>
-      <!-- !SECTION -->
     </VAvatar>
   </VBadge>
 </template>

@@ -13,5 +13,6 @@ export interface MediaRepository {
   findByPromptId(promptId: string): Promise<PromptMedia[]>
   findById(id: string): Promise<PromptMedia | null>
   unlinkFromPrompt(promptId: string): Promise<void>
+  deleteByPromptId(promptId: string): Promise<void>
   delete(id: string): Promise<boolean>
 }

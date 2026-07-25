@@ -2,6 +2,7 @@
 import { VNodeRenderer } from '@layouts/components/VNodeRenderer'
 import { themeConfig } from '@themeConfig'
 import { useUserStore } from '@/stores/use-user-store'
+import type { UserRole } from '@/models'
 
 import miscMaskDark from '@images/misc/misc-mask-dark.png'
 import miscMaskLight from '@images/misc/misc-mask-light.png'
@@ -21,34 +22,56 @@ const router = useRouter()
 const userStore = useUserStore()
 const authThemeMask = useGenerateImageVariant(miscMaskLight, miscMaskDark)
 
-const refLoginForm = ref<VForm>()
+const refRegisterForm = ref<VForm>()
 const isPasswordVisible = ref(false)
+const isConfirmPasswordVisible = ref(false)
+
 const email = ref('')
 const password = ref('')
-const loginError = ref<string | null>(null)
+const confirmPassword = ref('')
+const displayName = ref('')
+const role = ref<UserRole>('buyer')
+const registerError = ref<string | null>(null)
 
-async function onClickLogin() {
-  const isFormValid = await refLoginForm?.value?.validate()
+const roleOptions = [
+  { title: 'Buyer', value: 'buyer' as UserRole, subtitle: 'Browse and purchase prompts' },
+  { title: 'Creator', value: 'creator' as UserRole, subtitle: 'Create and sell prompts' },
+]
+
+const passwordRules = [
+  (v: string) => !!v || 'Password is required',
+  (v: string) => v.length >= 6 || 'Password must be at least 6 characters',
+]
+
+const confirmPasswordRules = [
+  (v: string) => !!v || 'Please confirm your password',
+  (v: string) => v === password.value || 'Passwords do not match',
+]
+
+async function onClickRegister() {
+  const isFormValid = await refRegisterForm?.value?.validate()
   if (!isFormValid?.valid)
     return
 
-  loginError.value = null
+  registerError.value = null
   try {
-    await userStore.login({
+    await userStore.register({
       email: email.value,
       password: password.value,
+      display_name: displayName.value,
+      role: role.value,
     })
     router.push('/')
   }
   catch (e: any) {
-    loginError.value = e.message || 'Login failed. Please check your credentials.'
+    registerError.value = e.message || 'Registration failed. Please try again.'
   }
 }
 </script>
 
 <template>
   <div class="auth-wrapper d-flex align-center justify-center pa-4">
-    <VCard class="auth-card pa-sm-4 pa-md-7 pa-0" min-width="500">
+    <VCard class="auth-card pa-sm-4 pa-md-7 pa-0" min-width="520">
       <VCardText>
         <div class="d-flex align-center gap-x-3 justify-center mb-6">
           <VNodeRenderer :nodes="themeConfig.app.logo" />
@@ -58,65 +81,107 @@ async function onClickLogin() {
           </h1>
         </div>
         <p class="mb-0 text-center text-medium-emphasis">
-          Sign in to your account
+          Create your account
         </p>
       </VCardText>
 
       <VCardText>
-        <VForm ref="refLoginForm" @submit.prevent="onClickLogin">
+        <VForm ref="refRegisterForm" @submit.prevent="onClickRegister">
           <VRow>
             <VCol cols="12">
               <VTextField
-                v-model="email"
+                v-model="displayName"
                 autofocus
-                label="Email"
-                type="email"
-                :rules="[requiredValidator, emailValidator]"
-                placeholder="your@email.com"
+                label="Display Name"
+                placeholder="Your name"
+                :rules="[requiredValidator]"
                 clearable
               />
             </VCol>
 
             <VCol cols="12">
               <VTextField
+                v-model="email"
+                label="Email"
+                type="email"
+                placeholder="your@email.com"
+                :rules="[requiredValidator, emailValidator]"
+                clearable
+              />
+            </VCol>
+
+            <VCol cols="12" md="6">
+              <VTextField
                 v-model="password"
                 label="Password"
                 placeholder="············"
-                :rules="[requiredValidator]"
+                :rules="passwordRules"
                 :type="isPasswordVisible ? 'text' : 'password'"
                 :append-inner-icon="isPasswordVisible ? 'ri-eye-off-line' : 'ri-eye-line'"
                 @click:append-inner="isPasswordVisible = !isPasswordVisible"
               />
+            </VCol>
 
+            <VCol cols="12" md="6">
+              <VTextField
+                v-model="confirmPassword"
+                label="Confirm Password"
+                placeholder="············"
+                :rules="confirmPasswordRules"
+                :type="isConfirmPasswordVisible ? 'text' : 'password'"
+                :append-inner-icon="isConfirmPasswordVisible ? 'ri-eye-off-line' : 'ri-eye-line'"
+                @click:append-inner="isConfirmPasswordVisible = !isConfirmPasswordVisible"
+              />
+            </VCol>
+
+            <VCol cols="12">
+              <label class="text-body-2 font-weight-medium d-block mb-2">
+                I want to...
+              </label>
+              <VRadioGroup
+                v-model="role"
+                inline
+                hide-details
+              >
+                <VRadio
+                  v-for="opt in roleOptions"
+                  :key="opt.value"
+                  :label="opt.title"
+                  :value="opt.value"
+                  :subtitle="opt.subtitle"
+                />
+              </VRadioGroup>
+            </VCol>
+
+            <VCol cols="12">
               <VAlert
-                v-if="loginError"
+                v-if="registerError"
                 color="error"
                 variant="tonal"
-                class="mt-4"
-                density="compact"
                 closable
-                @click:close="loginError = null"
+                density="compact"
+                @click:close="registerError = null"
               >
-                {{ loginError }}
+                {{ registerError }}
               </VAlert>
 
               <VBtn
                 block
                 type="submit"
                 :loading="userStore.isAuthLoading"
-                class="mt-6"
+                class="mt-2"
               >
-                Sign In
+                Create Account
               </VBtn>
             </VCol>
 
             <VCol cols="12" class="text-center text-body-2">
-              Don't have an account?
+              Already have an account?
               <RouterLink
-                :to="{ name: 'register' }"
+                :to="{ name: 'login' }"
                 class="text-primary font-weight-medium text-decoration-none"
               >
-                Sign up
+                Sign in
               </RouterLink>
             </VCol>
           </VRow>

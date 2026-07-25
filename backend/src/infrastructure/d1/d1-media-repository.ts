@@ -106,6 +106,13 @@ export class D1MediaRepository implements MediaRepository {
     return row ? toMedia(row) : null
   }
 
+  async deleteByPromptId(promptId: string): Promise<void> {
+    await this.db
+      .prepare('DELETE FROM prompt_media WHERE prompt_id = ?')
+      .bind(promptId)
+      .run()
+  }
+
   async unlinkFromPrompt(promptId: string): Promise<void> {
     await this.db
       .prepare('UPDATE prompt_media SET prompt_id = NULL WHERE prompt_id = ?')
