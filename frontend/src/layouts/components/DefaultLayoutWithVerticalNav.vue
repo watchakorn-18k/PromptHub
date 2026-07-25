@@ -2,13 +2,28 @@
 import { themeConfig } from '@themeConfig'
 import NavBarI18n from '@core/components/I18n.vue'
 import { VerticalNavLayout } from '@layouts'
-import navItems from '@/navigation/vertical'
+import navItems, { baseNavItems, marketplaceNavItems } from '@/navigation/vertical'
+import { useUserStore } from '@/stores/use-user-store'
 
 // Components
 import Footer from '@/layouts/components/Footer.vue'
 import NavbarThemeSwitcher from '@/layouts/components/NavbarThemeSwitcher.vue'
+import UserProfile from '@/layouts/components/UserProfile.vue'
 
 // @layouts plugin
+
+const userStore = useUserStore()
+
+const visibleNavItems = computed(() => {
+  const isAdmin = userStore.userRole === 'admin'
+
+  if (isAdmin) {
+    return navItems
+  }
+
+  // Non-admin: show base items + marketplace items
+  return [...baseNavItems, ...marketplaceNavItems]
+})
 
 // SECTION: Loading Indicator
 const isFallbackStateActive = ref(false)
@@ -26,7 +41,7 @@ watch([isFallbackStateActive, refLoadingIndicator], () => {
 </script>
 
 <template>
-  <VerticalNavLayout :nav-items="navItems">
+  <VerticalNavLayout :nav-items="visibleNavItems">
     <!-- 👉 navbar -->
     <template #navbar="{ toggleVerticalOverlayNavActive }">
       <div class="d-flex h-100 align-center">
@@ -45,6 +60,7 @@ watch([isFallbackStateActive, refLoadingIndicator], () => {
           :languages="themeConfig.app.i18n.langConfig"
         />
         <NavbarThemeSwitcher />
+        <UserProfile />
       </div>
     </template>
 
